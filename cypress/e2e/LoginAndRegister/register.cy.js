@@ -1,4 +1,9 @@
 import { faker } from "@faker-js/faker";
+import {
+  LoginPage,
+  RegistrationPage,
+  WelcomePage,
+} from "../../selectors/LoginAndRegistration";
 
 describe("Register scenario", () => {
   it("User can register", () => {
@@ -11,24 +16,22 @@ describe("Register scenario", () => {
       birthDate: "1996-12-20",
       password: faker.internet.password(),
     };
-    cy.get("input[data-testid='firstname-input']").type(user.name);
-    cy.get("input[data-testid='lastname-input']").type(user.lastName);
-    cy.get("input[data-testid='email-input']").type(user.email);
-    cy.get("input[data-testid='birthdate-input']").type(user.birthDate);
-    cy.get(".ui-datepicker-close").click();
-    cy.get("input[data-testid='password-input']").type(user.password);
-    cy.get("input[data-testid='register-button']").click();
+    RegistrationPage.FirstNameInput().type(user.name);
+    RegistrationPage.LastNameInput().type(user.lastName);
+    RegistrationPage.EmailInput().type(user.email);
+    RegistrationPage.BirthdayInput.type(user.birthDate);
+    RegistrationPage.CloseBirthdayDropdownButton().click();
+    RegistrationPage.PasswordInput().type(user.password);
+    RegistrationPage.RegisterButton().click();
     cy.wait("@Registration").its("response.statusCode").should("equal", 201);
 
     cy.url().should("contain", "/login/");
 
-    cy.get('[action="/process_login"]')
-      .find('[id="username"]')
-      .type(user.email);
-    cy.get('[id="password"]').type(user.password);
-    cy.get('[id="loginButton"]').click();
+    LoginPage.UsernameInput().type(user.email);
+    LoginPage.PasswordInput().type(user.password);
+    LoginPage.LoginButton().click();
 
     cy.url().should("contain", "/welcome");
-    cy.get('[data-testid="hello"]').should("have.text", `Hi ${user.email}!`);
+    WelcomePage.WelcomeMessage().should("have.text", `Hi ${user.email}!`);
   });
 });
