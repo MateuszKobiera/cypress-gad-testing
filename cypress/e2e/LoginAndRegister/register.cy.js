@@ -6,7 +6,7 @@ import {
 } from "../../selectors/LoginAndRegistration";
 
 describe("Register scenario", () => {
-  it("User can register", () => {
+  it("User can register on UI", () => {
     cy.visit("/register.html");
     cy.intercept("POST", "api/users").as("Registration");
     const user = {
@@ -33,5 +33,19 @@ describe("Register scenario", () => {
 
     cy.url().should("contain", "/welcome");
     WelcomePage.WelcomeMessage().should("have.text", `Hi ${user.email}!`);
+  });
+  it("User can register through API", () => {
+    const user = {
+      firstname: faker.person.firstName(),
+      lastname: faker.person.lastName(),
+      email: faker.internet.email(),
+      birthdate: "1996-12-20",
+      password: faker.internet.password(),
+      avatar: ".\\data\\users\\b678f2dd-a83e-42b7-9d1c-1a3ff7c224d1.jpg",
+    };
+
+    cy.apiRegisterUser(user).then((response) => {
+      expect(response.statusCode).to.equal(201);
+    });
   });
 });
